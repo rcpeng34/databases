@@ -4,33 +4,54 @@
  */
 
 var Sequelize = require("sequelize");
-var sequelize = new Sequelize("chat", "bacon", "pass");
+exports.sequelize = new Sequelize("chat", "root", "");
 /* TODO this constructor takes the database name, username, then password.
  * Modify the arguments if you need to */
 
 /* first define the data structure by giving property names and datatypes
  * See http://sequelizejs.com for other datatypes you can use besides STRING. */
-var User = sequelize.define('User', {
-  user_name: Sequelize.STRING,
+exports.messages = this.sequelize.define('messages', {
+  message: Sequelize.STRING,
+  //userId: Sequelize.INTEGER,
+  //roomId: Sequelize.INTEGER
 });
+
+exports.users = this.sequelize.define('users', {
+  name: Sequelize.STRING,
+});
+
+exports.rooms = this.sequelize.define('rooms', {
+  name: Sequelize.STRING,
+});
+
+this.messages.hasOne(this.users);
+this.users.belongsTo(this.messages);
+
+this.messages.hasOne(this.rooms);
+this.rooms.belongsTo(this.messages);
+
+this.messages.sync();
+this.users.sync();
+this.rooms.sync();
+
 
 /* .sync() makes Sequelize create the database table for us if it doesn't
  *  exist already: */
-User.sync().success(function() {
-  /* This callback function is called once sync succeeds. */
+// this.users.sync().success(function() {
+//   /* This callback function is called once sync succeeds. */
 
-  // now instantiate an object and save it:
-  var newUser = User.build({user_name: "Jean Valjean"});
-  newUser.save().success(function() {
+//   // now instantiate an object and save it:
+//   var newUser = this.users.build({user_name: "Jean Valjean"});
+//   newUser.save().success(function() {
 
-    /* This callback function is called once saving succeeds. */
+//     /* This callback function is called once saving succeeds. */
 
-    // Retrieve objects from the database:
-    User.findAll({ where: {user_name: "Jean Valjean"} }).success(function(usrs) {
-      // This function is called back with an array of matches.
-      for (var i = 0; i < usrs.length; i++) {
-        console.log(usrs[i].user_name + " exists");
-      }
-    });
-  });
-});
+//     // Retrieve objects from the database:
+//     this.users.findAll({ where: {name: "Jean Valjean"} }).success(function(users) {
+//       // This function is called back with an array of matches.
+//       for (var i = 0; i < users.length; i++) {
+//         console.log(users[i].name + " exists");
+//       }
+//     });
+//   });
+// });
