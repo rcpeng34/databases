@@ -39,10 +39,14 @@ exports.handler = function(request, response) {
       console.log("GET request received");
       response.writeHead(200, headers);
 
+      dbConnection.query('SELECT m.message, u.name, r.name from messages m\
+       join users u on m.userID = u.id\
+       join rooms r on m.roomId = r.id',
+          function(err, results) {
+            console.dir(results);
+          });
 
-      dbConnection.connect();
 
-      dbConnection.query('SELECT m.text, u.userName, c.roomName from messages m join users u on m.userID')
 
       // READ FILE used when saving messages in an rtf
       // fs.readFile('./server/messages.rtf', 'utf8', handleFile);
@@ -72,8 +76,37 @@ exports.handler = function(request, response) {
         newMessage.createdAt = Date();
 
       // APPEND FILE
-     fs.appendFile('./server/messages.rtf', ", " + JSON.stringify(newMessage));
-     // dbConnection.query()
+     //fs.appendFile('./server/messages.rtf', ", " + JSON.stringify(newMessage));
+
+        // dbConnection.query('SELECT * FROM rooms where name = ?', newMessage.roomname,
+        //   function(err, results) {
+        //     if results
+        //   }
+        dbConnection.query('INSERT INTO rooms (name) value (?)',
+          [newMessage.roomname],
+          function(err, roomResults) {
+            if (err) {
+              return err;
+            }
+            var roomId = roomResults.insertId;
+            dbConnection.query('INSERT INTO users (name) value (?)',
+              [newMessage.username],
+              function(err, userResults) {
+                if (err) {
+                  return err;
+                }
+                var userId = userResults.insertId;
+                dbConnection.query('INSERT INTO messages (createdAt, message, userId, roomId)\
+                  values (?, ?, ?, ?)',
+                  ['2010-01-01 01:01:01', newMessage.text, userId, roomId],
+                  function(err) {
+                    console.log('gets here');
+                    if (err) {
+                      console.log(err);
+                    }
+                  });
+              });
+          });
 
       });
       response.writeHead(201, headers);
