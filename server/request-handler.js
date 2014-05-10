@@ -40,15 +40,14 @@ exports.handler = function(request, response) {
       console.log("GET request received");
       response.writeHead(200, headers);
 
-      sequelize.messages.findAll().complete(function(err, data) {
-        console.log(data);
+      sequelize.messages.findAll({include: [sequelize.users, sequelize.rooms]}).complete(function(err, data) {
         var result = [];
         for (var i = 0; i < data.length; i++) {
           var preProcess = data[i]["dataValues"];
           var postProcess = {};
-          postProcess.username = preProcess.userId;
+          postProcess.username = preProcess["user"]["dataValues"]["name"];
           postProcess.text = preProcess.message;
-          postProcess.roomname = preProcess.roomId;
+          postProcess.roomname = preProcess["room"]["dataValues"]["name"];
           postProcess.createdAt = preProcess.createdAt;
           result.push(postProcess);
         }
