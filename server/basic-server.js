@@ -34,15 +34,3 @@ dbConnection.connect();
 var server = http.createServer(handler);
 console.log("Listening on http://" + ip + ":" + port);
 server.listen(port, ip);
-
-//dbConnection.connect();
-
-dbConnection.query('INSERT INTO messages VALUES (1, null, "hi", 3, 2);',
-  function(err, results) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(results, 'results');
-    }
-  }
-);
