@@ -24,11 +24,9 @@ exports.rooms = this.sequelize.define('rooms', {
   name: Sequelize.STRING,
 });
 
-this.messages.hasOne(this.users);
-this.users.belongsTo(this.messages);
+this.messages.belongsTo(this.users);
 
-this.messages.hasOne(this.rooms);
-this.rooms.belongsTo(this.messages);
+this.messages.belongsTo(this.rooms);
 
 this.messages.sync();
 this.users.sync();
