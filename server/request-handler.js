@@ -10,6 +10,7 @@ var fs = require("fs");
 var qs = require("querystring");
 var mysql = require("mysql");
 // var messages = require("./messages.js");
+var sequelize = require("../ORM_Refactor/orm-example.js")
 
 var dbConnection = mysql.createConnection({
   user: 'root',
@@ -39,12 +40,23 @@ exports.handler = function(request, response) {
       console.log("GET request received");
       response.writeHead(200, headers);
 
-      dbConnection.query('SELECT m.message, u.name, r.name from messages m\
-       join users u on m.userID = u.id\
-       join rooms r on m.roomId = r.id',
-          function(err, results) {
-            console.dir(results);
-          });
+      sequelize.messages.findAll().complete(function(err, data) {
+        console.log(data);
+        var result = []];
+        for (var i = 0; i < data.length; i++) {
+          // var preProcess =
+          result.push(data[i]["dataValues"]);
+        }
+        handleFile(err, data);
+      });
+
+      // dbConnection.query('SELECT m.message as text, m.createdAt as createdAt, u.name as username, r.name as roomname from messages m\
+      //  join users u on m.userID = u.id\
+      //  join rooms r on m.roomId = r.id',
+      //     function(err, results) {
+      //       console.dir(results);
+      //       handleFile(err, results);
+      //     });
 
 
 
@@ -58,7 +70,7 @@ exports.handler = function(request, response) {
         }
         //respond with all messages, but stringified
         // var responsePackage = {results: data};
-        var responsePackage = JSON.parse("[" + data + "]");
+        var responsePackage = data;
         responsePackage = JSON.stringify({results: responsePackage});
         response.end(responsePackage);
       }
@@ -78,35 +90,47 @@ exports.handler = function(request, response) {
       // APPEND FILE
      //fs.appendFile('./server/messages.rtf', ", " + JSON.stringify(newMessage));
 
-        // dbConnection.query('SELECT * FROM rooms where name = ?', newMessage.roomname,
-        //   function(err, results) {
-        //     if results
-        //   }
-        dbConnection.query('INSERT INTO rooms (name) value (?)',
-          [newMessage.roomname],
-          function(err, roomResults) {
-            if (err) {
-              return err;
-            }
-            var roomId = roomResults.insertId;
-            dbConnection.query('INSERT INTO users (name) value (?)',
-              [newMessage.username],
-              function(err, userResults) {
-                if (err) {
-                  return err;
-                }
-                var userId = userResults.insertId;
-                dbConnection.query('INSERT INTO messages (createdAt, message, userId, roomId)\
-                  values (?, ?, ?, ?)',
-                  ['2010-01-01 01:01:01', newMessage.text, userId, roomId],
-                  function(err) {
-                    console.log('gets here');
-                    if (err) {
-                      console.log(err);
-                    }
-                  });
+        sequelize.users.findOrCreate({name: newMessage.username})
+          .success(function(user) {
+            sequelize.rooms.findOrCreate({name: newMessage.roomname})
+              .success(function(room) {
+                sequelize.messages.create({
+                  message: newMessage.text,
+                  userId: user.values.id,
+                  roomId: room.values.id
+                }).success(function(message) {
+                  console.log(message.values);
+                });
               });
           });
+
+
+
+        // dbConnection.query('INSERT INTO rooms (name) value (?)',
+        //   [newMessage.roomname],
+        //   function(err, roomResults) {
+        //     if (err) {
+        //       return err;
+        //     }
+        //     var roomId = roomResults.insertId;
+        //     dbConnection.query('INSERT INTO users (name) value (?)',
+        //       [newMessage.username],
+        //       function(err, userResults) {
+        //         if (err) {
+        //           return err;
+        //         }
+        //         var userId = userResults.insertId;
+        //         dbConnection.query('INSERT INTO messages (createdAt, message, userId, roomId)\
+        //           values (?, ?, ?, ?)',
+        //           ['2010-01-01 01:01:01', newMessage.text, userId, roomId],
+        //           function(err) {
+        //             console.log('gets here');
+        //             if (err) {
+        //               console.log(err);
+        //             }
+        //           });
+        //       });
+        //   });
 
       });
       response.writeHead(201, headers);
