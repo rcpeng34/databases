@@ -2,38 +2,87 @@
 
 USE chat;
 
-DROP TABLE messages;
+-- drop table if exists messages;
+-- drop table if exists users;
+-- drop table if exists rooms;
+-- drop table if exists friends;
 
-DROP TABLE users;
+-- CREATE TABLE messages (
+--   'id' int NOT NULL AUTO_INCREMENT,
+--   'createdAt' datetime,
+--   'message' varchar(1000),
+--   'userId' int,
+--   'roomId' int,
+--   PRIMARY KEY ('id')
+-- );
 
-DROP TABLE chatroom;
+-- CREATE TABLE users (
+--   'id' int NOT NULL,
+--   'name' varchar(50),
+--   PRIMARY KEY ('id')
+-- );
 
-DROP TABLE friends;
 
-CREATE TABLE messages (
-  messageId int,
-  createdAt datetime,
-  messageText varchar(1000),
-  messageUserId int,
-  messageRoomId int
+-- CREATE TABLE rooms (
+--   'id' int NOT NULL,
+--   'name' varchar(50),
+--   PRIMARY KEY ('id')
+-- );
+
+-- CREATE TABLE friends (
+--   'userId' int,
+--   'friendId' int,
+-- );
+
+DROP TABLE IF EXISTS `messages`;
+
+CREATE TABLE `messages` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `createdAt` DATETIME NULL DEFAULT NULL,
+  `message` VARCHAR(1000) NULL DEFAULT NULL,
+  `userId` INTEGER NULL DEFAULT NULL,
+  `roomId` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT 'new';
+
+-- ---
+-- Table 'users'
+--
+-- ---
+
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `name` VARCHAR(50) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 );
 
-CREATE TABLE users (
-  userId int,
-  userName varchar(50)
+-- ---
+-- Table 'rooms'
+--
+-- ---
+
+DROP TABLE IF EXISTS `rooms`;
+
+CREATE TABLE `rooms` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `name` VARCHAR(50) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 );
 
+-- ---
+-- Table 'friends'
+--
+-- ---
 
-CREATE TABLE chatroom (
-  roomId int,
-  roomName varchar(50)
+DROP TABLE IF EXISTS `friends`;
+
+CREATE TABLE `friends` (
+  `userId` INTEGER NULL DEFAULT NULL,
+  `friendId` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`userId`)
 );
-
-CREATE TABLE friends (
-  userId int,
-  friendId int
-);
-
 
 
 /* You can also create more tables, if you need them... */
