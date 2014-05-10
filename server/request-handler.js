@@ -42,12 +42,17 @@ exports.handler = function(request, response) {
 
       sequelize.messages.findAll().complete(function(err, data) {
         console.log(data);
-        var result = []];
+        var result = [];
         for (var i = 0; i < data.length; i++) {
-          // var preProcess =
-          result.push(data[i]["dataValues"]);
+          var preProcess = data[i]["dataValues"];
+          var postProcess = {};
+          postProcess.username = preProcess.userId;
+          postProcess.text = preProcess.message;
+          postProcess.roomname = preProcess.roomId;
+          postProcess.createdAt = preProcess.createdAt;
+          result.push(postProcess);
         }
-        handleFile(err, data);
+        handleFile(err, result);
       });
 
       // dbConnection.query('SELECT m.message as text, m.createdAt as createdAt, u.name as username, r.name as roomname from messages m\
